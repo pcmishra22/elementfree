@@ -1,0 +1,10 @@
+/*------------------------------------------------------------------------------------*/
+/*------------------------------  YOUR CUSTOM CSS STYLE  -----------------------------*/
+.text_menu_button {
+   border: none;
+   background-color: transparent;
+   padding: 0;
+   color: #FFFFFF;  /* or whatever other color you want */
+   overflow:visible; 
+   font-size:1em;
+}
