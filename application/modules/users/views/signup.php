@@ -66,7 +66,7 @@
                         required: true,
                         minlength: 10
                     },
-		 conpass: {
+		          conpass: {
                         required: true,
                         minlength: 5,
 						equalTo: "#password"
@@ -79,7 +79,7 @@
                         required: "Please provide password",
                         minlength: "Your password must be at least 5 characters long"
                     },
- phone: {
+                    phone: {
                         required: "Please provide phone no.",
                         minlength: "Your phone no must be at least 10 characters long"
                     },
@@ -157,7 +157,7 @@
                             <input type="password" placeholder="Confirm Password (*)" name="conpass" id="conpass" class="input-field" required/>
                   
 
-<input type="text"  placeholder="Enter your phone (*)" name="phone" id="phone" class="input"  >
+                            <input type="text"  placeholder="Enter your mobile no (*)" name="mobile" id="mobile" class="input"  >
           
 <!--                            <button id="submit-form" class="btn btn-login ladda-button" data-style="expand-left"><span class="ladda-label">Sign Up</span></button> -->
 												<div class="submit">

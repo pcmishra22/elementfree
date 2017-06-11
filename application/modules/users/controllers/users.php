@@ -303,7 +303,8 @@ class Users extends MX_Controller{
                             $this->input->post('lastname') == "" ||
                             $this->input->post('email') == "" ||
                             $this->input->post('password') == "" ||
-                            $this->input->post('conpass') == ""
+                            $this->input->post('conpass') == "" ||
+                             $this->input->post('phone') == ""
                         ) {
                             $this->session->set_flashdata('flash_message_complete_fields', true);
                             redirect('users/signup/'.$id);
@@ -342,6 +343,7 @@ class Users extends MX_Controller{
                     'lastname' => $this->input->post('lastname'),
                     'emailid' => $this->input->post('email'),
                     'password' => md5($this->input->post('password')),
+                    'mobile' => $this->input->post('mobile'),
                     'create_datetime' => date("Y-m-d H:i:s"),
                     'accountid' => $this->users_model->getAcct($this->input->post('email'))
                  ); 
@@ -1955,11 +1957,18 @@ public function previewfilesdata($id)
 	  
 			if(!empty($result[0]['emailid']))
 			{
-				//set data in session
-				$this->session->set_userdata('userid', $result[0]['id']);
-				$this->session->set_userdata('email', $result[0]['emailid']);
-				$this->session->set_userdata('firstname',$result[0]['firstname']);
-				$this->session->set_userdata('lastname', $result[0]['lastname']);
+					//set data in session
+						$this->session->set_userdata('userid', $result[0]['id']);
+						$this->session->set_userdata('email', $result[0]['emailid']);
+						$this->session->set_userdata('firstname',$result[0]['firstname']);
+						$this->session->set_userdata('lastname', $result[0]['lastname']);
+						$this->session->set_userdata('accountid',$result[0]['accountid']);
+						$this->session->set_userdata('mobile',$result[0]['mobile']);
+						$this->session->set_userdata('activemenu',$this->session->userdata('firstname'));
+						$this->session->set_userdata('listpreview',"list");
+						$this->session->set_userdata('activedocumenu',"default");
+						$this->session->set_userdata('activemenulabel',"default");
+					//set data in session
 
 				redirect('users/dashboard');
 
@@ -1974,65 +1983,101 @@ public function previewfilesdata($id)
 	  //dashboard method calling
 	  public function dashboard()
 	  {
-			//check for user login
-			//$this->loginCheck();
-			//check for user login end here
-		 	if($this->session->userdata('captchaWord')==$_REQUEST['captcha'])
-			{
-				$result=$this->users_model->checkUser($this->input->post('username'),$this->input->post('password'));
-				if(!empty($result[0]['emailid']))
-				{
-					//set data in session
-						$this->session->set_userdata('userid', $result[0]['id']);
-						$this->session->set_userdata('email', $result[0]['emailid']);
-						$this->session->set_userdata('firstname',$result[0]['firstname']);
-						$this->session->set_userdata('lastname', $result[0]['lastname']);
-						$this->session->set_userdata('accountid',$result[0]['accountid']);
-						$this->session->set_userdata('activemenu',$this->session->userdata('firstname'));
-						$this->session->set_userdata('listpreview',"list");
-						$this->session->set_userdata('activedocumenu',"default");
-						$this->session->set_userdata('activemenulabel',"default");
-					//set data in session
-					
-					
-					//total files by user
-					$data['totalfiles']=$this->users_model->record_count_total_files($this->session->userdata('accountid'));
-					//total files
-					$this->session->set_userdata('totalfiles', $data['totalfiles']);
-					//set data in session
-				  $data['userdetails']=$this->users_model->userDetailsById($this->session->userdata('userid'));
-				  //user files details
-				  $data['filedetails']=$this->users_model->userFilesByAcctId($this->session->userdata('accountid'));
-				  //Get menu dates
-				  $data['dateresult']=$this->users_model->dateResultMenu($this->session->userdata('accountid'));
-				  //Get ElementFree Menu
-			    $data['documenu']=$this->users_model->docuMenu($this->session->userdata('accountid'),$this->session->userdata('activemenu'));
-                            //set dashboard data
-                            $data['myplan']=$this->users_model->myplan($this->session->userdata('accountid'));
-                            $newMembership = $this->users_model->number_files_available_and_used($this->session->userdata('accountid'));
-                            $data['newMembership'] = $newMembership;
-                            //set template
-					$this->template->set_template('front');
-					$this->template->write('title', 'Welcome to the ElementFree Admin Dashboard !');
-					$this->template->write_view('content', 'intro',$data);
-					$this->template->render();
-							 
-				}
-				else
-				{
-					$this->session->set_flashdata('flash_message', 'invaliduser');
-					redirect('users/login');
-				}
 
-			}
+			//check cookie for authorised user if cookie exist 
+			if($this->input->cookie('docufiler_cookie', TRUE))
+			{
+
+				//total files by user
+				$data['totalfiles']=$this->users_model->record_count_total_files($this->session->userdata('accountid'));
+				//total files
+				$this->session->set_userdata('totalfiles', $data['totalfiles']);
+				//set data in session
+				$data['userdetails']=$this->users_model->userDetailsById($this->session->userdata('userid'));
+				//user files details
+				$data['filedetails']=$this->users_model->userFilesByAcctId($this->session->userdata('accountid'));
+				//Get menu dates
+				$data['dateresult']=$this->users_model->dateResultMenu($this->session->userdata('accountid'));
+				//Get ElementFree Menu
+				    $data['documenu']=$this->users_model->docuMenu($this->session->userdata('accountid'),$this->session->userdata('activemenu'));
+	                            //set dashboard data
+	                            $data['myplan']=$this->users_model->myplan($this->session->userdata('accountid'));
+	                            $newMembership = $this->users_model->number_files_available_and_used($this->session->userdata('accountid'));
+	                            $data['newMembership'] = $newMembership;
+	                            //set template
+						$this->template->set_template('front');
+						$this->template->write('title', 'Welcome to the ElementFree Admin Dashboard !');
+						$this->template->write_view('content', 'intro',$data);
+						$this->template->render();
+						}
 			else
 			{
-				$this->session->set_flashdata('flash_message', 'mismatch');
-				redirect('users/login');
-			}
+				redirect('users/verifyphone');
+
+			}					 
+
 
 	  }
-	 	//file preview gallery
+	//sns code
+
+	  public function sendMessage($msg,$phone)
+	  {
+
+		  	require './vendor/autoload.php';
+			//get accesskey from database
+			$appdetails=$this->users_model->getSettings();
+
+			//AWS access info
+			if (!defined('awsAccessKey')) define('awsAccessKey', $appdetails[0]['awsAccessKey']);
+			if (!defined('awsSecretKey')) define('awsSecretKey', $appdetails[0]['awsSecretKey']);
+
+			$params = array(
+			    'credentials' => array(
+			        'key' => awsAccessKey,
+			        'secret' => awsSecretKey,
+			    ),
+			    'region' => 'us-east-1', // < your aws from SNS Topic region
+			    'version' => 'latest'
+			);
+			$sns = new \Aws\Sns\SnsClient($params);
+
+			//SetSMSAttributes
+
+			$args = array(
+			    "SenderID" => "docufiler",
+			    "SMSType" => "Transational",
+			    "Message" => $msg,
+			    "PhoneNumber" => "1".$phone
+			);
+
+			$result = $sns->publish($args);
+
+	  }
+	 //phone verification
+	  function verifyphone()
+	  {
+			$msg=rand(10000,99999);
+			$this->session->set_userdata('randomno', $msg);
+			$this->sendMessage($msg,$this->session->userdata('mobile'));
+			$this->load->view('otp');
+	  }
+	   //verify otp
+	  function verifyotp()
+	  {
+	  	if($_REQUEST['password']==$this->session->userdata('randomno'))
+	  	{
+	  		//set cookie   
+            setcookie("docufiler_cookie",'1', time() + (86400 * 30), "/"); // 86400 = 1 day
+	  		//redirect to dashboard
+	  		redirect('users/dashboard');
+	  	}
+	  	else
+	  	{
+	  		$this->session->set_flashdata('flash_message', 'invalid');
+	  		redirect('users/verifyphone');
+	  	}
+	  }
+	 //file preview gallery
 	  public function gallery()
 	  {
 		  //check for user login
@@ -2056,7 +2101,7 @@ public function previewfilesdata($id)
 			$this->template->render();
 	  }
 	 
-	 	 	//file preview 
+	 //file preview 
 	  public function filespreview()
 	  {
 		  //check for user login
