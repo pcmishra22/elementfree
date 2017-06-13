@@ -304,7 +304,7 @@ class Users extends MX_Controller{
                             $this->input->post('email') == "" ||
                             $this->input->post('password') == "" ||
                             $this->input->post('conpass') == "" ||
-                             $this->input->post('phone') == ""
+                             $this->input->post('mobile') == ""
                         ) {
                             $this->session->set_flashdata('flash_message_complete_fields', true);
                             redirect('users/signup/'.$id);
